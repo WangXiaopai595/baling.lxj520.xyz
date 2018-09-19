@@ -164,7 +164,7 @@ return [
 
     'log'                    => [
         // 日志记录方式，内置 file socket 支持扩展
-        'type'  => 'File',
+        'type'  => 'test',//关闭、原为File
         // 日志保存目录
         'path'  => LOG_PATH,
         // 日志记录级别
@@ -193,48 +193,70 @@ return [
 //        // 缓存有效期 0表示永久缓存
 //        'expire' => 0,
 //    ],
-	'cache' =>  [
-		// 使用复合缓存类型
-		'type'  =>  'complex',
-		// 默认使用的缓存
-		'default'   =>  [
-			// 驱动方式
-			'type'   => 'File',
-			// 缓存保存目录
-			'path'   => CACHE_PATH,
-		],
-		// redis缓存
-		'redis'   =>  [
-			// 驱动方式
-			'type'   => 'Redis',
-			//地址
-			'host'   => '120.78.77.192',
-			//端口
-			'port'   => '6379',
-			//密码
-			'password' => 'yxkj123',
-			//前缀
-			'prefix' => 'rbac_',
-			//延迟时间
-			'timeout'=> 3600
-		],
+
+	'cache'                  => [
+		// 驱动方式
+		'type'   => 'redis',
+		'host' => '60.205.207.244',
+		'port'       => 6379,
+		'password'   => 'lxj520',
+		'prefix'     => 'baling_',
 	],
+
+//	'cache' =>  [
+//		// 使用复合缓存类型
+//		'type'  =>  'complex',
+//		// 默认使用的缓存
+//		'default'   =>  [
+//			// 驱动方式
+//			'type'   => 'File',
+//			// 缓存保存目录
+//			'path'   => CACHE_PATH,
+//		],
+//		// redis缓存
+//		'redis'   =>  [
+//			// 驱动方式
+//			'type'   => 'Redis',
+//			//地址
+//			'host'   => '120.78.77.192',
+//			//端口
+//			'port'   => '6379',
+//			//密码
+//			'password' => 'yxkj123',
+//			//前缀
+//			'prefix' => 'rbac_',
+//			//延迟时间
+//			'timeout'=> 3600
+//		],
+//	],
 
     // +----------------------------------------------------------------------
     // | 会话设置
     // +----------------------------------------------------------------------
 
-    'session'                => [
-        'id'             => '',
-        // SESSION_ID的提交变量,解决flash上传跨域
-        'var_session_id' => '',
-        // SESSION 前缀
-        'prefix'         => 'think',
-        // 驱动方式 支持redis memcache memcached
-        'type'           => '',
-        // 是否自动开启 SESSION
-        'auto_start'     => true,
-    ],
+//    'session'                => [
+//        'id'             => '',
+//        // SESSION_ID的提交变量,解决flash上传跨域
+//        'var_session_id' => '',
+//        // SESSION 前缀
+//        'prefix'         => 'think',
+//        // 驱动方式 支持redis memcache memcached
+//        'type'           => '',
+//        // 是否自动开启 SESSION
+//        'auto_start'     => true,
+//    ],
+
+	'session'                => [
+		'prefix'     => 'baling_',
+		'type'       => 'redis',
+		'auto_start' => true,
+		// redis主机
+		'host'       => '127.0.0.1',
+		// redis端口
+		'port'       => 6379,
+		// 密码
+		'password'   => 'lxj520',
+	],
 
     // +----------------------------------------------------------------------
     // | Cookie设置
