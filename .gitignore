@@ -2,3 +2,4 @@
 *.log
 runtime
 application/database.php
+thinkphp
