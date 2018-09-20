@@ -40,7 +40,8 @@ class Index extends Controller
 			'time',
 			'id',
 			'title',
-			'content'
+			'content',
+			'url'
 		];
 		$article = Loader::model('Article')->dataSingle($map,$field);
 		$this->assign('article',$article);

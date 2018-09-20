@@ -84,7 +84,7 @@ class Site extends Common
 			$arr['sketch'] = $article['digest'];
 			$arr['time'] = $article['create_time'];
 			$arr['type'] = $param['type'];
-			$arr['content'] = $article['content'];
+			$arr['content'] = str_replace('data-src','src',$article['content']);
 			$data[] = $arr;
 		}
 
