@@ -1,8 +1,11 @@
 <?php
 namespace app\admin\controller;
 use think\Controller;
+use app\admin\controller\Traits\WxApi;
 class Index extends Controller
 {
+	use WxApi;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -82,7 +85,11 @@ class Index extends Controller
 	/**
 	 * 欢迎页
 	 */
-	public function main(){
+	public function main()
+	{
+		$image = $this->getWxFodder('image',0,10);
+		dump($image);
+
 		$info = array(
 			'运行环境'=>$_SERVER["SERVER_SOFTWARE"],
 			'主机名'=>$_SERVER['SERVER_NAME'],
