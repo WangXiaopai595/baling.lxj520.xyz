@@ -84,6 +84,7 @@ class Site extends Common
 			$arr['sketch'] = $article['digest'];
 			$arr['time'] = $article['create_time'];
 			$arr['type'] = $param['type'];
+			$arr['content'] = $article['content'];
 			$data[] = $arr;
 		}
 
