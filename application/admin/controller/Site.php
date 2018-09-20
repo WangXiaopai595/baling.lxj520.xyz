@@ -3,8 +3,10 @@ namespace app\admin\controller;
 use app\admin\controller;
 use think\Loader;
 use think\Request;
+use app\admin\controller\Traits\WxApi;
 class Site extends Common
 {
+	use WxApi;
 	/**
 	 * 文章列表
 	 * @return mixed
@@ -148,23 +150,35 @@ class Site extends Common
 			}
 			return $result;
 		}else{
+			$page = input('page') ?: 1;
+			$count = 10;
+			$offset = $page * $count;
+			$image = $this->getWxFodder('image',$offset,$count);
+			$this->assign('img',$image);
+			dump($image);
 			return $this->fetch();
 		}
 	}
 
+	/**
+	 * 修改banner信息
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 11:04
+	 * @return array|mixed
+	 */
 	public function bannerEdit()
 	{
 		$data = Request::instance()->param();
 		$map['id'] = $data['id'];
 		if(Request::instance()->isAjax()){
 			//获取上传图片并保存
-			$file = Request::instance()->file();
-			$path = uploadFile($file);
-			if($path){
-				foreach($path as $k=>$v){
-					$data[$k] = $v;
-				}
-			}
+//			$file = Request::instance()->file();
+//			$path = uploadFile($file);
+//			if($path){
+//				foreach($path as $k=>$v){
+//					$data[$k] = $v;
+//				}
+//			}
 			$resCode = Loader::model('Banner')->bannerEdit($map,$data);
 			if($resCode){
 				$result = ['status' => 1,'msg' => '修改成功'];
@@ -224,9 +238,9 @@ class Site extends Common
 	}
 
 	//正则处理图片地址
-	public function pregReplace($str){
-		$preg = '/(<img[^>]*[^data-]src="http.*)\?{1}.*(".*>)/U';
-		$str = preg_replace($preg,'${1}${2}',$str);
-		return $str;
-	}
+//	public function pregReplace($str){
+//		$preg = '/(<img[^>]*[^data-]src="http.*)\?{1}.*(".*>)/U';
+//		$str = preg_replace($preg,'${1}${2}',$str);
+//		return $str;
+//	}
 }
