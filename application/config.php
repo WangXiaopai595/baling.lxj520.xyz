@@ -197,7 +197,7 @@ return [
 	'cache'                  => [
 		// 驱动方式
 		'type'   => 'redis',
-		'host' => '60.205.207.244',
+		'host' => '127.0.0.1',
 		'port'       => 6379,
 		'password'   => 'lxj520',
 		'prefix'     => 'baling_',

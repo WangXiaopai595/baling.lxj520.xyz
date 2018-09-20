@@ -77,4 +77,16 @@ class Banner extends Model
 		$result = $this->commonModel->where($map)->field($field)->find();
 		return $result;
 	}
+
+	/**
+	 * 批量写入数据库
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 14:12
+	 * @param $data
+	 * @return int|string
+	 */
+	public function bannerAddAll($data)
+	{
+		return $this->commonModel->insertAll($data);
+	}
 }

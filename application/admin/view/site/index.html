@@ -11,7 +11,17 @@
 				</div>-->
 				{if condition="in_array('site/articleadd',$operable)"}
 					<div class="layui-inline">
-						<a href="{:url('site/articleadd')}" class="layui-btn layui-btn-normal newsAdd_btn">添加文章</a>
+						<a href="{:url('site/articleadd',['type' => 1])}" class="layui-btn layui-btn-normal newsAdd_btn">添加设计案例</a>
+					</div>
+				{/if}
+				{if condition="in_array('site/articleadd',$operable)"}
+					<div class="layui-inline">
+						<a href="{:url('site/articleadd',['type' => 2])}" class="layui-btn layui-btn-normal newsAdd_btn">添加施工档案</a>
+					</div>
+				{/if}
+				{if condition="in_array('site/articlesort',$operable)"}
+					<div class="layui-inline">
+						<a data-url="{:url('site/articlesort')}" id="edit" class="layui-btn recommend" style="background-color:#5FB878">更新排序</a>
 					</div>
 				{/if}
 				{if condition="in_array('site/articledel',$operable)"}
@@ -33,6 +43,7 @@
 							<th>标题</th>
 							<th>封面图</th>
 							<th>简介</th>
+							<th>排序</th>
 							<th>发布时间</th>
 							<th>所属板块</th>
 							<th>操作</th>
@@ -48,9 +59,15 @@
 								<td>
 									<img src="{$vo.cover}" style="width: 50px;height: 50px;" />
 								</td>
-								<td style="20%">
+								<td style="width: 40%;">
 									<div style="width: 100%;height: 50px;overflow: auto;">
 										{$vo.sketch}
+									</div>
+								</td>
+								<td>
+									<div class="layui-inline">
+										<input name="sort" class="layui-input search_input" type="text" value="{$vo.sort}">
+										<input name="id" type="hidden" class="roleid" value="{$vo.id}" />
 									</div>
 								</td>
 								<td>
@@ -64,9 +81,9 @@
 									{/if}
 								</td>
 								<td>
-									{if condition="in_array('site/articleedit',$operable)"}
-										<a href="{:url('site/articleedit',array('id'=>$vo['id']))}" class="layui-btn layui-btn-mini "><i class="iconfont icon-edit"></i> 编辑</a>
-									{/if}
+									<!--{if condition="in_array('site/articleedit',$operable)"}-->
+										<!--<a href="{:url('site/articleedit',array('id'=>$vo['id']))}" class="layui-btn layui-btn-mini "><i class="iconfont icon-edit"></i> 编辑</a>-->
+									<!--{/if}-->
 									{if condition="(in_array('site/articledel',$operable))"}
 										<a data-url="{:url('site/articledel')}" data-id="{$vo.id}" class="layui-btn layui-btn-danger layui-btn-mini delete" data-id="1"><i class="layui-icon"></i> 删除</a>
 									{/if}
@@ -92,6 +109,46 @@
 			layer.photos({
 			  	photos: '#table',
 			  	anim: 5
+			});
+		})
+
+		/**
+		 * 更新排序
+		 */
+		$("#edit").click(function(){
+			var index = layer.load(0, {time: 10000});
+			var url = $(this).attr("data-url");
+			var gid = $("input[name='id']");
+			var sort = $("input[name='sort']");
+			var id = '';
+			var sor = '';
+			for(var i=0;i<gid.length;i++){
+				if(i == 0){
+					id = gid.eq(i).val();
+					sor = sort.eq(i).val();
+				}else{
+					id += ','+gid.eq(i).val();
+					sor += ','+sort.eq(i).val();
+				}
+			}
+			$.ajax({
+				type:"post",
+				dataType:"json",
+				url:url,
+				data:{
+					id:id,
+					sort:sor
+				},
+				success:function(date){
+					if(date.status == 1){
+						layer.msg(date.msg,{icon:1,time:1000});
+						setTimeout(function(){
+							location.reload();
+						},400)
+					}else{
+						layer.msg(date.msg,{icon:2,time:1000});
+					}
+				}
 			});
 		})
 		

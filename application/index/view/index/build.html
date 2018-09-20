@@ -37,7 +37,7 @@
 		</div>
 		<div class="div0">
 			{volist name="article" id="vo"}
-				<a class="list_item" href="{:url('index/detail',['id'=>$vo['id']])}">
+				<a class="list_item" href="{$vo.url}">
 					<div class="cover">
 						<img src="{$vo.cover}">
 					</div>

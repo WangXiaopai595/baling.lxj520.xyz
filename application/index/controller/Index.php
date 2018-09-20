@@ -20,7 +20,8 @@ class Index extends Controller
 			'id',
 			'title',
 			'cover',
-			'sketch'
+			'sketch',
+			'url'
 		];
 		$map['type'] = 1;
 		$article = Loader::model('Article')->articleList($map,$field,'0,10');
