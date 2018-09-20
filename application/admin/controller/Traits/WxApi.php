@@ -157,7 +157,7 @@ trait WxApi
 	{
 		$result = [];
 		foreach($data['item'] as $value){
-			$value['url'] = $this->pregReplace($value['url']);
+//			$value['url'] = $this->pregReplace($value['url']);
 			Cache::set('image_' . $value['media_id'],$value);
 			$result[] = $value;
 		}
