@@ -4,6 +4,7 @@ use app\admin\controller;
 use think\Loader;
 use think\Request;
 use app\admin\controller\Traits\WxApi;
+use think\Cache;
 class Site extends Common
 {
 	use WxApi;
@@ -20,10 +21,78 @@ class Site extends Common
 			'sketch',//简介
 			'time',//发布时间
 			'type',//所属板块
+			'sort'
 		];
 		$article = Loader::model('Article')->articleList($field);
 		$this->assign('article',$article);
 		return $this->fetch();
+	}
+
+	/**
+	 * 更新文章排序
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 15:22
+	 * @return array
+	 */
+	public function articleSort()
+	{
+		$data = Request::instance()->param();
+		$groupID = explode(',',$data['id']);
+		$groupSort = explode(',',$data['sort']);
+		$resCode = true;
+		\think\Db::startTrans();
+		try{
+			foreach($groupID as $k=>$v){
+				$map['id'] = $v;
+				$arr['sort'] = $groupSort[$k];
+				Loader::model('Article')->articleEdit($map,$arr);
+			}
+			\think\Db::commit();
+		}catch(\Exception $e){
+			$resCode = false;
+			\think\Db::rollback();
+		}
+		if($resCode){
+			$result = ['status' => 1,'msg' => '修改成功'];
+		}else{
+			$result = ['status' => 0,'msg' => '参数错误'];
+		}
+		return $result;
+	}
+
+	/**
+	 * 批量写入数据库
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 15:15
+	 * @return array
+	 */
+	public function articleAddAll()
+	{
+		$param = Request::instance()->param();
+
+		$data = [];
+		foreach($param['title'] as $value){
+			$article = Cache::get('news_' . $value);
+			if(!$article){
+				return ['status' => 0,'msg' => '页面已失效，请刷新后再试!'];
+			}
+
+			$arr = [];
+			$arr['title'] = $article['title'];
+			$arr['cover'] = $article['thumb_url'];
+			$arr['url'] = $article['url'];
+			$arr['sketch'] = $article['digest'];
+			$arr['time'] = $article['create_time'];
+			$arr['type'] = $param['type'];
+			$data[] = $arr;
+		}
+
+		$res = Loader::model('Article')->articleAddAll($data);
+		if($res){
+			return ['status' => 1,'msg' => '添加成功'];
+		}else{
+			return ['status' => 0,'msg' => '添加失败'];
+		}
 	}
 
 	/**
@@ -32,28 +101,14 @@ class Site extends Common
 	 */
 	public function articleAdd()
 	{
-		if(Request::instance()->isAjax()){
-			$data = Request::instance()->param();
-			//获取上传图片并保存
-			$file = Request::instance()->file();
-			$path = uploadFile($file);
-			if($path){
-				foreach($path as $k=>$v){
-					$data[$k] = $v;
-				}
-			}
-			$data['time'] = time();
-			$data['content'] = $this->pregReplace($data['content']);
-			$resCode = Loader::model('Article')->articleAdd($data);
-			if($resCode){
-				$result = ['status' => 1,'msg' => '发布成功'];
-			}else{
-				$result = ['status' => 0,'msg' => '参数错误'];
-			}
-			return $result;
-		}else{
-			return $this->fetch();
-		}
+		$page = input('page') ?: 1;
+		$count = 10;
+		$offset = ($page - 1) * $count;
+		$artice = $this->getWxFodder('news',$offset,$count);
+		$artice['data'] = $this->isExistence($artice['data'],input('type'));
+		$this->assign('article',$artice);
+		$this->assign('type',input('type'));
+		return $this->fetch();
 	}
 
 	/**
@@ -63,7 +118,7 @@ class Site extends Common
 	public function articleDel()
 	{
 		$data = Request::instance()->param();
-		$map['id'] = ['in',$data];
+		$map['id'] = ['in',$data['id']];
 		$resCode = Loader::model('Article')->articleDelete($map);
 		if($resCode){
 			$result = ['status' => 1,'msg' => '删除成功'];
@@ -132,31 +187,40 @@ class Site extends Common
 	 */
 	public function bannerAdd()
 	{
-		if(Request::instance()->isAjax()){
-			$data = Request::instance()->param();
-			//获取上传图片并保存
-			$file = Request::instance()->file();
-			$path = uploadFile($file);
-			if($path){
-				foreach($path as $k=>$v){
-					$data[$k] = $v;
-				}
+		$page = input('page') ?: 1;
+		$count = 10;
+		$offset = ($page - 1) * $count;
+		$image = $this->getWxFodder('image',$offset,$count);
+		$this->assign('img',$image);
+		return $this->fetch();
+	}
+
+	/**
+	 * 添加banner图片
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 14:14
+	 * @return array
+	 */
+	public function bannerAddAll()
+	{
+		$param = Request::instance()->param();
+		$img = explode(',',$param['img']);
+
+		$img_url = [];
+		foreach($img as $value){
+			$arr = [];
+			$cache_img = Cache::get('image_' . $value);
+			if(!$cache_img){
+				return ['status' => 0,'msg' => '页面已失效，请刷新后再试!'];
 			}
-			$resCode = Loader::model('Banner')->bannerAdd($data);
-			if($resCode){
-				$result = ['status' => 1,'msg' => '添加成功'];
-			}else{
-				$result = ['status' => 0,'msg' => '参数错误'];
-			}
-			return $result;
+			$arr['banner'] = $cache_img['url'];
+			$img_url[] = $arr;
+		}
+		$res = Loader::model('Banner')->bannerAddAll($img_url);
+		if($res){
+			return ['status' => 1,'msg' => '添加成功'];
 		}else{
-			$page = input('page') ?: 1;
-			$count = 10;
-			$offset = $page * $count;
-			$image = $this->getWxFodder('image',$offset,$count);
-			$this->assign('img',$image);
-			dump($image);
-			return $this->fetch();
+			return ['status' => 0,'msg' => '添加失败'];
 		}
 	}
 

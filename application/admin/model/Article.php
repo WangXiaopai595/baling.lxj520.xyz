@@ -32,8 +32,17 @@ class Article extends Model
 	 * @return mixed 列表信息  分页标签类
 	 */
 	public function articleList($field){
-		$result['list'] = $this->commonModel->field($field)->order('time desc')->paginate(10);
+		$result['list'] = $this->commonModel->field($field)->order('sort,time desc')->paginate(10);
 		$result['page'] = $result['list']->render();
+		return $result;
+	}
+
+	/**
+	 * 分页列表
+	 * @return mixed 列表信息  分页标签类
+	 */
+	public function GetArticle($where,$field){
+		$result = $this->commonModel->where($where)->field($field)->select();
 		return $result;
 	}
 
@@ -76,5 +85,17 @@ class Article extends Model
 			$result = false;
 		}
 		return $result;
+	}
+
+	/**
+	 * 批量写入数据库
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 14:12
+	 * @param $data
+	 * @return int|string
+	 */
+	public function articleAddAll($data)
+	{
+		return $this->commonModel->insertAll($data);
 	}
 }

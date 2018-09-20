@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\Traits;
 use think\Cache;
+use think\Loader;
 use think\paginator\driver\Bootstrap;
 trait WxApi
 {
@@ -16,7 +17,7 @@ trait WxApi
 			$appid = $wxconfig['appid'];
 			$appsecret = $wxconfig['appsecret'];
 			$url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$appid.'&secret='.$appsecret;
-			$result = $this->sendcurl($url,array(),array(),'GET',true);
+			$result = $this->sendcurl($url,[],[],'GET',true);
 			$result = json_decode($result,true);
 			if(!empty($result['access_token'])){
 				$token = $result['access_token'];
@@ -77,7 +78,7 @@ trait WxApi
 			$url .= $token;
 		}
 
-		$result = $this->sendcurl($url,$date,array(),$dataType,true);
+		$result = $this->sendcurl($url,$date,[],$dataType,true);
 		$result = json_decode($result,true);
 		return $result;
 	}
@@ -112,7 +113,7 @@ trait WxApi
 		$result = $this->wxcurl($url,$data);
 
 		//分页
-		$page = Bootstrap::make('',$count,input('page'),$result['total_count']);
+		$page = Bootstrap::make('',$count,input('page')?:1,$result['total_count'],false,['path' => '/' . request()->path()]);
 
 		//根据不同类型采取不同操作
 		if($type == 'image'){
@@ -124,6 +125,41 @@ trait WxApi
 		$res['data'] = $result;
 		$res['page'] = $page->render();
 		return $res;
+	}
+
+	/**
+	 * 查询数据库是否存在当前文章
+	 * Created by：Mp_Lxj
+	 * @date 2018/9/20 14:50
+	 * @param $data
+	 * @return mixed
+	 */
+	public function isExistence($data,$type)
+	{
+		$title = [];
+		foreach($data as $value){
+			$title[] = $value['title'];
+		}
+		//以title为条件查询当前文章数据库
+		$map['title'] = ['in',$title];
+		$map['type'] = ['=',$type];
+		$isBe = Loader::model('Article')->GetArticle($map,['title']);
+
+		//提取查询结果
+		$my_title = [];
+		foreach($isBe as $value){
+			$my_title[] = $value['title'];
+		}
+
+		//当前列表是否已存在
+		foreach($data as &$value){
+			if(in_array($value['title'],$my_title)){
+				$value['is_be'] = 1;
+			}else{
+				$value['is_be'] = 0;
+			}
+		}
+		return $data;
 	}
 
 	/**
@@ -140,7 +176,7 @@ trait WxApi
 			foreach($value['content']['news_item'] as $v){
 				$v['create_time'] = $value['content']['create_time'];
 				$result[] = $v;
-				Cache::set('news_' . $v['title'],$v);
+				Cache::set('news_' . $v['title'],$v,7200);
 			}
 		}
 		return $result;
@@ -157,17 +193,9 @@ trait WxApi
 	{
 		$result = [];
 		foreach($data['item'] as $value){
-//			$value['url'] = $this->pregReplace($value['url']);
-			Cache::set('image_' . $value['media_id'],$value);
+			Cache::set('image_' . $value['media_id'],$value,7200);
 			$result[] = $value;
 		}
 		return $result;
-	}
-
-	//正则处理图片地址
-	public function pregReplace($str){
-		$preg = '/\?{1}.*/';
-		$str = preg_replace($preg,'',$str);
-		return $str;
 	}
 }

@@ -17,7 +17,7 @@ class Article extends Model
 	 * @return mixed 列表信息  分页标签类
 	 */
 	public function articleList($map,$field,$limit){
-		$result = $this->commonModel->where($map)->field($field)->order('time desc')->limit($limit)->select();
+		$result = $this->commonModel->where($map)->field($field)->order('sort,time desc')->limit($limit)->select();
 		return $result;
 	}
 
