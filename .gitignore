@@ -2,8 +2,4 @@
 *.log
 runtime
 application/database.php
-<<<<<<< HEAD
 extend
-=======
-extend
->>>>>>> 85c58316b784acb9c7bb6effdf4f2293ed7e5bd3
