@@ -158,6 +158,8 @@ trait WxApi
 
 		//当前列表是否已存在
 		foreach($data as &$value){
+			dump($value);
+			dump($my_time);
 			if(in_array($value['title'],$my_title) && in_array($value['create_time'],$my_time)){
 				$value['is_be'] = 1;
 			}else{
