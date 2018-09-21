@@ -137,12 +137,15 @@ trait WxApi
 	public function isExistence($data,$type)
 	{
 		$title = [];
+		$time = [];
 		foreach($data as $value){
 			$title[] = $value['title'];
+			$time[] = $value['create_time'];
 		}
 		//以title为条件查询当前文章数据库
 		$map['title'] = ['in',$title];
 		$map['type'] = ['=',$type];
+		$map['time'] = ['in',$time];
 		$isBe = Loader::model('Article')->GetArticle($map,['title']);
 
 		//提取查询结果
