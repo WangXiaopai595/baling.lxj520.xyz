@@ -41,7 +41,7 @@
 							<tr>
 								<td>
 									{if condition="$vo['is_be'] eq 0"}
-										<input name="check" type="checkbox" value="{$vo.title}" style="display: block;">
+										<input name="check" type="checkbox" value="{$vo['title'] . '_' . $v['create_time']}" style="display: block;">
 									{/if}
 								</td>
 								<td>{$vo.title}</td>

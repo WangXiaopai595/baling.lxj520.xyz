@@ -176,7 +176,7 @@ trait WxApi
 			foreach($value['content']['news_item'] as $v){
 				$v['create_time'] = $value['content']['create_time'];
 				$result[] = $v;
-				Cache::set('news_' . $v['title'],$v,7200);
+				Cache::set('news_' . $v['title'] . '_' . $v['create_time'],$v,7200);
 			}
 		}
 		return $result;
