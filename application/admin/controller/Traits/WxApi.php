@@ -137,30 +137,23 @@ trait WxApi
 	public function isExistence($data,$type)
 	{
 		$title = [];
-		$time = [];
 		foreach($data as $value){
 			$title[] = $value['title'];
-			$time[] = $value['create_time'];
 		}
 		//以title为条件查询当前文章数据库
 		$map['title'] = ['in',$title];
 		$map['type'] = ['=',$type];
-		$map['time'] = ['in',$time];
-		$isBe = Loader::model('Article')->GetArticle($map,['title','time']);
+		$isBe = Loader::model('Article')->GetArticle($map,['title']);
 
 		//提取查询结果
 		$my_title = [];
-		$my_time = [];
 		foreach($isBe as $value){
 			$my_title[] = $value['title'];
-			$my_time[] = $value['time'];
 		}
 
 		//当前列表是否已存在
 		foreach($data as &$value){
-			dump($value);
-			dump($my_time);
-			if(in_array($value['title'],$my_title) && in_array($value['create_time'],$my_time)){
+			if(in_array($value['title'],$my_title)){
 				$value['is_be'] = 1;
 			}else{
 				$value['is_be'] = 0;
@@ -183,7 +176,7 @@ trait WxApi
 			foreach($value['content']['news_item'] as $v){
 				$v['create_time'] = $value['content']['create_time'];
 				$result[] = $v;
-				Cache::set('news_' . $v['title'] . '_' . $v['create_time'],$v,7200);
+				Cache::set('news_' . $v['title'],$v,7200);
 			}
 		}
 		return $result;
