@@ -146,17 +146,19 @@ trait WxApi
 		$map['title'] = ['in',$title];
 		$map['type'] = ['=',$type];
 		$map['time'] = ['in',$time];
-		$isBe = Loader::model('Article')->GetArticle($map,['title']);
+		$isBe = Loader::model('Article')->GetArticle($map,['title','time']);
 
 		//提取查询结果
 		$my_title = [];
+		$my_time = [];
 		foreach($isBe as $value){
 			$my_title[] = $value['title'];
+			$my_time[] = $value['time'];
 		}
 
 		//当前列表是否已存在
 		foreach($data as &$value){
-			if(in_array($value['title'],$my_title)){
+			if(in_array($value['title'],$my_title) && in_array($value['create_time'],$my_time)){
 				$value['is_be'] = 1;
 			}else{
 				$value['is_be'] = 0;
