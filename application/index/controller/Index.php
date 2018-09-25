@@ -1,5 +1,6 @@
 <?php
 namespace app\index\controller;
+use think\Cache;
 use think\Controller;
 use think\Loader;
 
@@ -35,15 +36,20 @@ class Index extends Controller
 	 */
 	public function detail(){
 		$data = \think\Request::instance()->param();
-		$map['id'] = $data['id'];
-		$field = [
-			'time',
-			'id',
-			'title',
-			'content',
-			'url'
-		];
-		$article = Loader::model('Article')->dataSingle($map,$field);
+		$article = Cache::get('article_' . $data['id']);
+
+		if(!$article){
+			$map['id'] = $data['id'];
+			$field = [
+				'time',
+				'id',
+				'title',
+				'content',
+				'url'
+			];
+			$article = Loader::model('Article')->dataSingle($map,$field);
+			Cache::set('article_' . $article['id'],$article);
+		}
 		$this->assign('article',$article);
 		return $this->fetch();
 	}
