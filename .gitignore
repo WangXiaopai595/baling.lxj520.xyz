@@ -2,4 +2,5 @@
 *.log
 runtime
 application/database.php
+application/config.php
 extend
